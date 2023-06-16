@@ -218,7 +218,8 @@ function RouterClass:handleTransmission(sender, message)
 			if verbosity >= 2 then
 				print("  Got "..type(message.target).." instead of 'number'")
 			end
-		return
+			return
+		end
 		
 		if type(message.protocol) ~= "string" and message.protocol ~= nil then
 			print("Discarding broken packet")
