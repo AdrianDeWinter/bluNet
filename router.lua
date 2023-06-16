@@ -65,7 +65,7 @@ function RouterClass:listen()
 		elseif protocol == "packet" then
 			self:handleTransmission(sender, message)
 		else
-			print("From "..sender.id.." via "..protocol..":")
+			print("From "..sender.id.." via "..(protocol or "any")..":")
 			if protocol == "dns" then
 				print("Request for "..message.sProtocol)
 			else
