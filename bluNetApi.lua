@@ -95,7 +95,7 @@ local function sendbyHostName(name, msg, protocol)
 			error("HostNotfoundError")
 		end
 
-		-- restore to full HostClass ojects
+		-- restore to full HostClass objects
 		local hosts = HostClass.fromTable(response)
 			if verbosity >= 1 then
 				print("DNS yielded "..#hosts.." Results")

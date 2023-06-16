@@ -4,6 +4,8 @@ require('modem')
 require('host')
 require('tableUtils')
 
+local verbosity = verbosity or 2
+
 --stores information about a router, specifically, which other routers and hosts are accessible through it
 RouterClass = {id=nil,modems={}}
 function RouterClass.__init__(baseClass, id, modems)
@@ -49,6 +51,9 @@ end
 function RouterClass:listen()
 	ModemClass.openAllModems(self.modems)
 	rednet.host("router",("router"..self.id))
+	if verbosity >= 2 then
+		print("Running router on computer "..self.id)
+	end
 	while true do
 		print("Listening...")
 		local sender, message, protocol = rednet.receive()
@@ -84,7 +89,7 @@ function RouterClass:handleDnsRequest(sender, message)
 	local result = {rednet.lookup(message.protocol, message.hostname)}
 	
 	--see if the requester has ended up in the list. if so, remove them
-	if verbose >= 2 then
+	if verbosity >= 2 then
 		print("Local Hosts:")
 	end
 	
@@ -92,13 +97,13 @@ function RouterClass:handleDnsRequest(sender, message)
 	for i,host in pairs (result) do
 		if host ~= sender.id then
 			local hostObj = HostClass(host, {self.id})
-			if verbose >= 2 then
+			if verbosity >= 2 then
 				print("Host:\n"..tostring(hostObj).."\n")
 			end
 			table.insert(routes, hostObj)
 		end
 	end
-	if verbose >= 2 then
+	if verbosity >= 2 then
 		print("Found "..#routes .. " matching hosts locally, checking remote networks...")
 	end
 	
@@ -108,30 +113,30 @@ function RouterClass:handleDnsRequest(sender, message)
 	for _,routerId in pairs(result) do
 		router = HostClass(routerId)
 		if not table.contains(message.routers,router) then
-			if verbose >= 2 then
+			if verbosity >= 2 then
 				print("Found Router:\n  "..tostring(router))
 			end
 			table.insert(routers, RouterClass(routerId,{}))
-		elseif verbose >= 2 then
+		elseif verbosity >= 2 then
 			print("Skipping Router:\n  "..tostring(router))
 		end
 	end
 	
 	if #routers > 0 then
-		if verbose >= 1 then
+		if verbosity >= 1 then
 			print("Found "..(#routers).." other routers on the network, propagating request...")
 		end
 		
 		for _,router in pairs(routers) do
 			--send dns requests to all routers in range except self and the requester
-			if verbose >= 2 then
+			if verbosity >= 2 then
 				print("Sending DNS Request to Router "..router.id)
 			end
 			
 			rednet.send(router.id, message, "dns_request")
 			
 			local r, result, p = rednet.receive("dns_response")
-			if verbose >= 2 then
+			if verbosity >= 2 then
 				print("Recieved " .. #result .. " host id's from the remote router "..router.id)
 			end
 			
@@ -166,7 +171,7 @@ function RouterClass:handleDnsRequest(sender, message)
 	end
 	
 	print ("Returning a total of "..#routes.." host id's to the requester")			
-	if verbose >= 2 then
+	if verbosity >= 2 then
 		for i,route in pairs(routes) do
 			print("Host:\n"..tostring(route))
 		end
@@ -175,14 +180,14 @@ function RouterClass:handleDnsRequest(sender, message)
 end
 
 function RouterClass:handleTransmission(sender, message)
-	if verbose >= 1 then 
+	if verbosity >= 1 then 
 		print("Handling packet from "..sender.id)
 	end
 	if #message.route == 0 then
 		print("A packet not addressed to this computer has reached TTL")
 		return
 	elseif #message.route == 1 then
-		if verbose >= 2 then
+		if verbosity >= 2 then
 			print("Last router on route, passing packet to final destination")
 		end
 		--send on to recipient
@@ -191,7 +196,7 @@ function RouterClass:handleTransmission(sender, message)
 		--route along
 		table.remove(message.route)
 		local nextHop = message.route[#message.route]
-		if verbose >= 2 then
+		if verbosity >= 2 then
 			print("Not last router on route, passing packet to router "..nextHop)
 		end
 		rednet.send(nextHop, message, "packet")
