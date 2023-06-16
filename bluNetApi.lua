@@ -6,37 +6,89 @@ require ("overloaded")
 
 
 local allowNonUniqueTargetHosts = allowNonUniqueTargetHosts or false
-local verbositiy = verbositiy or 0
+local verbositiy = verbositiy or 2
 
 local function sendbyHostName(name, msg, protocol)
+	if verbosity >= 1 then
+		print("Attempting to message "..name.."...")
+	end
+	
+	if verbosity >= 2 then
+		print("Message: "..msg)
+	end
+	
 	-- try to find the target on the local network
 	local target = {rednet.lookup(protocol, host)}
+	if verbosity >= 1 then
+		print("Recieved lookup Response with "..#target.."entries")
+	end
+	
+	if verbosity >= 2 then
+		print(target)
+	end
+	
 	-- raise an error if the host does not exist
 	if next(target) == nil then
+		if verbosity >= 1 then
+			print("Target host was not found")
+		end
 		error("HostNotFoundError")
-	elseif #target ~= 1 then
+	
 	-- raise and error if the host is not unique, unless configured otherwise
+	elseif #target ~= 1 then
 		if allowNonUniqueTargetHosts then
+			if verbosity >= 1 then
+				print("Target host was not unique. allowNonUniqueTargetHosts is set to true. Sending message...")
+			end
 			rednet.send(target[1], msg, protocol)
 		else
+			if verbosity >= 1 then
+				print("Target host was not unique. Set allowNonUniqueTargetHosts to true to send anyways")
+			end
 			error("HostNotUniqueError")
 		end
+	
 	else
+		if verbosity >= 1 then
+			print("Sending on local network")
+		end
 		rednet.send(target[1], msg, protocol)
+		if verbosity >= 2 then
+			print("Sent")
+		end
 	end
 
 	-- if routers are present, start a dns request
 	-- find routers
+	if verbosity >= 1 then
+		print("Target not on local network. Querying DNS...")
+	end
+	
 	local routers = {rednet.lookup("router")}
+
 	if next(routers) == nil then
+		if verbosity >= 1 then
+			print("No routers available. Target can not be reached")
+		end
 		error("HostNotfoundError")
 	else
+		if verbosity >= 2 then
+			print("Found "...#routers.." Router instances")
+			print("Querying router...")
+		end
+		
 		rednet.send(routers[1], {protocol = protocol, hostname = name}, "dns_request")
 		local _, response,_ = rednet.receive("dns_response", 5)
 		if response == nil then
+			if verbosity >= 1 then
+				print("Router did not respon in time")
+			end
 			error("RequestTimeoutError")
 		end
 		if #response == 0 then
+			if verbosity >= 1 then
+				print("DNS yielded no results. Host can not be reached")
+			end
 			error("HostNotfoundError")
 		end
 

@@ -4,7 +4,7 @@ require('router')
 require('modem')
 require('tableUtils')
 
-verbose=1
+verbose=2
 selfRouter = RouterClass(os.getComputerID())
 selfRouter.modems = ModemClass.getAllModems(selfRouter)
 selfRouter:listen()
