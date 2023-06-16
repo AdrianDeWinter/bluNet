@@ -6,7 +6,7 @@ require ("overloaded")
 
 
 local allowNonUniqueTargetHosts = allowNonUniqueTargetHosts or false
-local verbositiy = verbositiy or 2
+local verbosity = verbosity or 2
 
 local function sendbyHostName(name, msg, protocol)
 	if verbosity >= 1 then
