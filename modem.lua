@@ -1,6 +1,8 @@
 local v = "0.1.0"
 print ("Using Modem version "..v)
 
+local verbosity = verbosity or 2
+
 ModemClass = {side="", parent={}}
 function ModemClass.__init__(baseClass, side, parent)
 	side = side or ""
@@ -56,30 +58,30 @@ end
 function ModemClass.getAllModems(selfRouter)
 	local peripherals = peripheral.getNames()
 	local modems = {}
-	if verbose >= 1 then
+	if verbosity >= 1 then
 		print("gathering modems from peripherals")
 	end
 	for _,peri in pairs(peripherals) do
 		if peripheral.getType(peri) == "modem" then
 			local newModem = ModemClass(peri, selfRouter)
-			if verbose >= 2 then
+			if verbosity >= 2 then
 				print("found modem on the "..newModem.side)
 			end
 			modems[#modems + 1] = newModem
 		end
 	end
-	if verbose >= 1 then
+	if verbosity >= 1 then
 		print("found "..#peripherals.." devices, "..#modems.." of which are modems")
 	end
 	return modems
 end
 function ModemClass.openAllModems(modems)
 	local modems = modems or ModemClass.getAllModems()
-	if verbose >= 1 then
+	if verbosity >= 1 then
 		print("opening modems")
 	end
 	for _,modem in pairs(modems) do
-		if verbose >= 2 then
+		if verbosity >= 2 then
 			print ("opening modem: "..modem.side)
 		end
 		modem:open()
@@ -87,11 +89,11 @@ function ModemClass.openAllModems(modems)
 end
 function ModemClass.closeAllModems(modems)
 	local modems = modems or ModemClass.getAllModems()
-	if verbose >= 1 then
+	if verbosity >= 1 then
 		print("closing modems")
 	end
 	for _,modem in pairs(modems) do
-		if verbose >= 2 then
+		if verbosity >= 2 then
 			print ("closing modem: "..modem.side)
 		end
 		modem:close()
