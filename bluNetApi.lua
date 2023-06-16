@@ -1,9 +1,7 @@
 local v = "0.1.0"
 print ("Running bluNet api version "..v)
-require("modem")
 require("host")
 require ("overloaded")
-
 
 local allowNonUniqueTargetHosts = allowNonUniqueTargetHosts or false
 local verbosity = verbosity or 2

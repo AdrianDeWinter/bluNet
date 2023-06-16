@@ -1,7 +1,13 @@
 local v = "0.1.0"
+verbosity = 2
+allowNonuniqueTargetHosts = true
+
 print ("Running test Script version "..v)
 require('host')
+require("modem")
+require("bluNetApi")
 
+ModemClass.openAllModems()
 
 router = rednet.lookup("router")
 print("Found router "..router)
@@ -23,4 +29,7 @@ print("sending test packet")
 local target = response[1]
 rednet.send(target.route[#target.route], {target = target.id, payload="test erfolg", protocol="test_res", route=target.route}, "packet")
 
+bluNetApi.send("pda", "test erfolg", "test_res")
+
 ModemClass.closeAllModems()
+
