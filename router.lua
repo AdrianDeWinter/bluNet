@@ -183,6 +183,24 @@ function RouterClass:handleTransmission(sender, message)
 	if verbosity >= 1 then 
 		print("Handling packet from "..sender.id)
 	end
+	if message == nil or message.route == nil or message.target == nil then
+		print("Discarding broken packet")
+		if verbosity >= 1 then
+			print("  Packet was discarded for missing required fields")
+		end
+		return
+	end
+	
+	if type(message.route) != "table" then
+		print("Discarding broken packet")
+		if verbosity >= 1 then
+			print("  Packet was discarded for an incorrect data type in route field")
+		end
+		if verbosity >= 2 then
+			print("  Got "..type(message.route).." instead of 'table'")
+		end
+		return
+	end
 	if #message.route == 0 then
 		print("A packet not addressed to this computer has reached TTL")
 		return
@@ -190,8 +208,32 @@ function RouterClass:handleTransmission(sender, message)
 		if verbosity >= 2 then
 			print("Last router on route, passing packet to final destination")
 		end
+		
+		--catch broken packets
+		if type(message.target) != "number" then
+			print("Discarding broken packet")
+			if verbosity >= 1 then
+				print("  Packet was discarded for an incorrect data type in target field")
+			end
+			if verbosity >= 2 then
+				print("  Got "..type(message.target).." instead of 'number'")
+			end
+		return
+		
+		if type(message.protocol) != "string" and message.protocol != nil then
+			print("Discarding broken packet")
+			if verbosity >= 1 then
+				print("  Packet was discarded for an incorrect data type in protocol field")
+			end
+			if verbosity >= 2 then
+				print("  Got "..type(message.target).." instead of 'string' or nil")
+			end
+			return
+		end
+		
 		--send on to recipient
 		rednet.send(message.target, message.payload, message.protocol)
+
 	else
 		--route along
 		table.remove(message.route)
