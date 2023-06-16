@@ -73,17 +73,21 @@ end
 function RouterClass:handleDnsRequest(sender, message)
 	message.routers = HostClass.fromTable(message.routers)
 	table.insert(message.routers, HostClass(self.id))
+	
 	local printString = "Received DNS request from " .. sender.id..", looking for \"" .. message.protocol .. "\""
 	if message.hostname ~= nil then
 		printString = printString.." running on \""..message.hostname.."\""
 	end
 	print(printString)
+	
 	--send a dns lookup into all connected networks
 	local result = {rednet.lookup(message.protocol, message.hostname)}
+	
 	--see if the requester has ended up in the list. if so, remove them
 	if verbose >= 2 then
 		print("Local Hosts:")
 	end
+	
 	local routes = {}
 	for i,host in pairs (result) do
 		if host ~= sender.id then
@@ -97,6 +101,7 @@ function RouterClass:handleDnsRequest(sender, message)
 	if verbose >= 2 then
 		print("Found "..#routes .. " matching hosts locally, checking remote networks...")
 	end
+	
 	--get nearby routers and repeat the request to them
 	local result = {rednet.lookup("router")}
 	local routers = {}
@@ -111,20 +116,25 @@ function RouterClass:handleDnsRequest(sender, message)
 			print("Skipping Router:\n  "..tostring(router))
 		end
 	end
+	
 	if #routers > 0 then
 		if verbose >= 1 then
 			print("Found "..(#routers).." other routers on the network, propagating request...")
 		end
+		
 		for _,router in pairs(routers) do
 			--send dns requests to all routers in range except self and the requester
 			if verbose >= 2 then
 				print("Sending DNS Request to Router "..router.id)
 			end
+			
 			rednet.send(router.id, message, "dns_request")
+			
 			local r, result, p = rednet.receive("dns_response")
 			if verbose >= 2 then
 				print("Recieved " .. #result .. " host id's from the remote router "..router.id)
 			end
+			
 			--append the own id to each hosts route, and add them to the list of hosts
 			result = HostClass.fromTable(result)
 			for _,host in pairs(result) do

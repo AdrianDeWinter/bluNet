@@ -81,7 +81,7 @@ local function sendbyHostName(name, msg, protocol)
 		end
 		
 		rednet.send(routers[1], {protocol = protocol, hostname = name}, "dns_request")
-		local _, response,_ = rednet.receive("dns_response", 5)
+		local _, response,_ = rednet.receive("dns_response", 10)
 		if response == nil then
 			if verbosity >= 1 then
 				print("Router did not respon in time")

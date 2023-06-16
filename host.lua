@@ -13,7 +13,7 @@ end
 setmetatable(HostClass, {__index=table,__call=HostClass.__init__})
 
 function HostClass:toString()
-	ret = "ID: "..self.id
+	local ret = "ID: "..self.id
 	if #self.route>0 then
 		ret = ret.."\nHops:\n"
 		for i,hop in ipairs(self.route) do
