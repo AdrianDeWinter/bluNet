@@ -73,7 +73,7 @@ local function sendbyHostName(name, msg, protocol)
 		error("HostNotfoundError")
 	else
 		if verbosity >= 2 then
-			print("Found "...#routers.." Router instances")
+			print("Found "..#routers.." Router instances")
 			print("Querying router...")
 		end
 		
@@ -125,6 +125,7 @@ function send.default(...)
 	print ("Invalid argument types: "..argTypes)
 end
 
+-- overloads for targeting host ids
 function send.number.string.string(recipient, message, protocol)
 	sendbyHostid(recipient, message, protocol)
 end
@@ -157,10 +158,7 @@ function send.number.boolean.nil_val(recipient, message, protocol)
 	sendbyHostid(recipient, message, protocol)
 end
 
-local function sendbyHostId(id, msg, protocol)
-
-end
-
+-- Overloads for targeting host names
 function send.string.string.string(recipient, message, protocol)
 	sendbyHostName(recipient, message, protocol)
 end
@@ -190,5 +188,22 @@ function send.string.boolean.string(recipient, message, protocol)
 end
 
 function send.string.boolean.nil_val(recipient, message, protocol)
+	sendbyHostName(recipient, message, protocol)
+end
+
+-- Overloads for targeting protocols
+function send.nil_val.string.string(recipient, message, protocol)
+	sendbyHostName(recipient, message, protocol)
+end
+
+function send.nil_val.number.string(recipient, message, protocol)
+	sendbyHostName(recipient, message, protocol)
+end
+
+function send.nil_val.table.string(recipient, message, protocol)
+	sendbyHostName(recipient, message, protocol)
+end
+
+function send.nil_val.boolean.string(recipient, message, protocol)
 	sendbyHostName(recipient, message, protocol)
 end
