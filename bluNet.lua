@@ -119,7 +119,7 @@ end
 -- define overloads to discriminate between host name and host id based transmission
 send = overloaded()
 
-function send.default(...)
+function bluNet.send.default(...)
 	local argTypes = ""
 	for _,v in ipairs(arg) do
 		argTypes = argTypes..type(v)..", "
@@ -129,84 +129,84 @@ function send.default(...)
 end
 
 -- overloads for targeting host ids
-function send.number.string.string(recipient, message, protocol)
+function bluNet.send.number.string.string(recipient, message, protocol)
 	sendbyHostid(recipient, message, protocol)
 end
 
-function send.number.string.nil_val(recipient, message, protocol)
+function bluNet.send.number.string.nil_val(recipient, message, protocol)
 	sendbyHostid(recipient, message, protocol)
 end
 
-function send.number.number.string(recipient, message, protocol)
+function bluNet.send.number.number.string(recipient, message, protocol)
 	sendbyHostid(recipient, message, protocol)
 end
 
-function send.number.number.nil_val(recipient, message, protocol)
+function bluNet.send.number.number.nil_val(recipient, message, protocol)
 	sendbyHostid(recipient, message, protocol)
 end
 
-function send.number.table.string(recipient, message, protocol)
+function bluNet.send.number.table.string(recipient, message, protocol)
 	sendbyHostid(recipient, message, protocol)
 end
 
-function send.number.table.nil_val(recipient, message, protocol)
+function bluNet.send.number.table.nil_val(recipient, message, protocol)
 	sendbyHostid(recipient, message, protocol)
 end
 
-function send.number.boolean.string(recipient, message, protocol)
+function bluNet.send.number.boolean.string(recipient, message, protocol)
 	sendbyHostid(recipient, message, protocol)
 end
 
-function send.number.boolean.nil_val(recipient, message, protocol)
+function bluNet.send.number.boolean.nil_val(recipient, message, protocol)
 	sendbyHostid(recipient, message, protocol)
 end
 
 -- Overloads for targeting host names
-function send.string.string.string(recipient, message, protocol)
+function bluNet.send.string.string.string(recipient, message, protocol)
 	sendbyHostName(recipient, message, protocol)
 end
 
-function send.string.string.nil_val(recipient, message, protocol)
+function bluNet.send.string.string.nil_val(recipient, message, protocol)
 	sendbyHostName(recipient, message, protocol)
 end
 
-function send.string.number.string(recipient, message, protocol)
+function bluNet.send.string.number.string(recipient, message, protocol)
 	sendbyHostName(recipient, message, protocol)
 end
 
-function send.string.number.nil_val(recipient, message, protocol)
+function bluNet.send.string.number.nil_val(recipient, message, protocol)
 	sendbyHostName(recipient, message, protocol)
 end
 
-function send.string.table.string(recipient, message, protocol)
+function bluNet.send.string.table.string(recipient, message, protocol)
 	sendbyHostName(recipient, message, protocol)
 end
 
-function send.string.table.nil_val(recipient, message, protocol)
+function bluNet.send.string.table.nil_val(recipient, message, protocol)
 	sendbyHostName(recipient, message, protocol)
 end
 
-function send.string.boolean.string(recipient, message, protocol)
+function bluNet.send.string.boolean.string(recipient, message, protocol)
 	sendbyHostName(recipient, message, protocol)
 end
 
-function send.string.boolean.nil_val(recipient, message, protocol)
+function bluNet.send.string.boolean.nil_val(recipient, message, protocol)
 	sendbyHostName(recipient, message, protocol)
 end
 
 -- Overloads for targeting protocols
-function send.nil_val.string.string(recipient, message, protocol)
+function bluNet.send.nil_val.string.string(recipient, message, protocol)
 	sendbyHostName(recipient, message, protocol)
 end
 
-function send.nil_val.number.string(recipient, message, protocol)
+function bluNet.send.nil_val.number.string(recipient, message, protocol)
 	sendbyHostName(recipient, message, protocol)
 end
 
-function send.nil_val.table.string(recipient, message, protocol)
+function bluNet.send.nil_val.table.string(recipient, message, protocol)
 	sendbyHostName(recipient, message, protocol)
 end
 
-function send.nil_val.boolean.string(recipient, message, protocol)
+function bluNet.send.nil_val.boolean.string(recipient, message, protocol)
 	sendbyHostName(recipient, message, protocol)
 end

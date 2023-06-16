@@ -5,7 +5,7 @@ allowNonuniqueTargetHosts = true
 print ("Running test Script version "..v)
 require('host')
 require("modem")
-require("bluNetApi")
+require("bluNet")
 
 ModemClass.openAllModems()
 
@@ -29,7 +29,12 @@ print("sending test packet")
 local target = response[1]
 rednet.send(target.route[#target.route], {target = target.id, payload="test erfolg", protocol="test_res", route=target.route}, "packet")
 
-bluNetApi.send("pda", "test erfolg", "test_res")
+bluNet.send("pda", "test erfolg", "test_res")
+
+rednet.host("test_channel", "test_pc")
+local _, msg, _ = bluNet.send(os.getComputerID(), "Full success!", "test_channel")
+rednet.unhost("test_channel")
+print(msg)
 
 ModemClass.closeAllModems()
 
