@@ -17,7 +17,7 @@ local function sendbyHostName(name, msg, protocol)
 		-- raise an error if the host does not exist
 		if next(target) == nil then
 			error("HostNotFoundError")
-		else if #target ~= 1 then
+		elseif #target ~= 1 then
 		-- raise and error if the host is not unique, unless configured otherwise
 			if allowNonUniqueTargetHosts then
 				rednet.send(target[1], msg, protocol)
