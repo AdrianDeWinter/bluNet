@@ -29,40 +29,35 @@ local function sendbyHostName(name, msg, protocol)
 		end
 	end
 	
-	-- raise an error if the host does not exist
-	if next(target) == nil then
-		if verbosity >= 1 then
-			print("Target host was not found")
-		end
-		error("HostNotFoundError")
-	
-	-- raise and error if the host is not unique, unless configured otherwise
-	elseif #target ~= 1 then
-		if allowNonUniqueTargetHosts then
-			if verbosity >= 1 then
-				print("Target host was not unique. allowNonUniqueTargetHosts is set to true. Sending message...")
+	-- raise an error if the host does not exist	
+	if next(target) ~= nil then
+		if #target ~= 1 then	
+			-- raise and error if the host is not unique, unless configured otherwise
+			if allowNonUniqueTargetHosts then
+				if verbosity >= 1 then
+					print("Target host was not unique. allowNonUniqueTargetHosts is set to true. Sending message...")
+				end
+				rednet.send(target[1], msg, protocol)
+			else
+				if verbosity >= 1 then
+					print("Target host was not unique. Set allowNonUniqueTargetHosts to true to send anyways")
+				end
+				error("HostNotUniqueError")
 			end
-			rednet.send(target[1], msg, protocol)
+		-- if a unique target host was found, send the message
 		else
 			if verbosity >= 1 then
-				print("Target host was not unique. Set allowNonUniqueTargetHosts to true to send anyways")
+				print("Sending on local network")
 			end
-			error("HostNotUniqueError")
+			rednet.send(target[1], msg, protocol)
+			if verbosity >= 2 then
+				print("Sent")
+			end
+			return
 		end
-	
-	else
-		if verbosity >= 1 then
-			print("Sending on local network")
-		end
-		rednet.send(target[1], msg, protocol)
-		if verbosity >= 2 then
-			print("Sent")
-		end
-		return
 	end
 
-	-- if routers are present, start a dns request
-	-- find routers
+	-- if routers are present and we have not returned yet, start a dns request
 	if verbosity >= 1 then
 		print("Target not on local network. Querying DNS...")
 	end
@@ -106,10 +101,10 @@ local function sendbyHostName(name, msg, protocol)
 			end
 		end
 		--find shortest route
-		local shortestRoute = hosts[1].route
+		local shortestRoute = hosts[1]
 		for _,host in pairs(hosts) do
-			if #host.route < #shortestRoute then
-				local shortestRoute = host
+			if #host.route < #shortestRoute.route then
+				shortestRoute = host
 			end
 		end
 		
@@ -129,9 +124,9 @@ send = overloaded()
 function send.default(...)
 	local argTypes = ""
 	for _,v in ipairs(arg) do
-		local argTypes = argTypes..type(v)..", "
+		argTypes = argTypes..type(v)..", "
 	end
-	local artypes = argTypes:sub(1, -3) -- delete trailing ", "
+	argtypes = argTypes:sub(1, -3) -- delete trailing ", "
 	print ("Invalid argument types: "..argTypes)
 end
 
