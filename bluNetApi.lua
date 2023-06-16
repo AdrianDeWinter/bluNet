@@ -24,8 +24,8 @@ local function sendbyHostName(name, msg, protocol)
 	end
 	
 	if verbosity >= 2 then
-		for _, v in pais(target) do
-			print v
+		for _, v in pairs(target) do
+			print(v)
 		end
 	end
 	
@@ -77,7 +77,7 @@ local function sendbyHostName(name, msg, protocol)
 	else
 		if verbosity >= 2 then
 			print("Found "..#routers.." Router instances")
-			print("Querying router "..router[1])
+			print("Querying router "..routers[1])
 		end
 		
 		rednet.send(routers[1], {protocol = protocol, hostname = name}, "dns_request")
@@ -101,13 +101,13 @@ local function sendbyHostName(name, msg, protocol)
 				print("DNS yielded "..#hosts.." Results")
 			end
 		if verbosity >= 2 then
-			for _,v in hosts do
+			for _,v in pairs(hosts) do
 				print(v)
 			end
 		end
 		--find shortest route
 		local shortestRoute = hosts[1].route
-		for host in pairs(hosts) do
+		for _,host in pairs(hosts) do
 			if #host.route < #shortestRoute then
 				local shortestRoute = host
 			end
