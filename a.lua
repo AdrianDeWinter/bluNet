@@ -1,14 +1,14 @@
 local v = "0.1.0"
 print ("Running test Script version "..v)
 require('host')
-require('announce')
+-- require('announce')
 
 
 router = rednet.lookup("router")
 print("Found router "..router)
 
 print("Sending DNS request")
-rednet.send(router, {protocol = "test", hostname="pda", routers = {HostClass(os.getComputerID())}}, "dns_request")
+rednet.send(router, {protocol = "test", hostname="pda"}, "dns_request")
 print("Awaiting DNS response")
 
 s, response, p = rednet.receive("dns_response")

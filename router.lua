@@ -36,7 +36,7 @@ function RouterClass.equal(host1, host2)
 	return result and retval
 end
 
---takes in a table of host objects and creates new host objects from them (used to restore mthods after transmission over the network)
+--takes in a table of host objects and creates new host objects from them (used to restore class methods after transmission over the network)
 function RouterClass.fromTable(t)
 retval = {}
 	for _,router in pairs(t) do
@@ -169,7 +169,7 @@ function RouterClass:handleTransmission(sender, message)
 		print("Handling packet from "..sender.id)
 	end
 	if #message.route == 0 then
-		print("Packet not addressed to this computer has reached TTL")
+		print("A packet not addressed to this computer has reached TTL")
 		return
 	elseif #message.route == 1 then
 		if verbose >= 2 then
