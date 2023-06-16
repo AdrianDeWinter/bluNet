@@ -191,7 +191,7 @@ function RouterClass:handleTransmission(sender, message)
 		return
 	end
 	
-	if type(message.route) != "table" then
+	if type(message.route) ~= "table" then
 		print("Discarding broken packet")
 		if verbosity >= 1 then
 			print("  Packet was discarded for an incorrect data type in route field")
@@ -210,7 +210,7 @@ function RouterClass:handleTransmission(sender, message)
 		end
 		
 		--catch broken packets
-		if type(message.target) != "number" then
+		if type(message.target) ~= "number" then
 			print("Discarding broken packet")
 			if verbosity >= 1 then
 				print("  Packet was discarded for an incorrect data type in target field")
@@ -220,7 +220,7 @@ function RouterClass:handleTransmission(sender, message)
 			end
 		return
 		
-		if type(message.protocol) != "string" and message.protocol != nil then
+		if type(message.protocol) ~= "string" and message.protocol ~= nil then
 			print("Discarding broken packet")
 			if verbosity >= 1 then
 				print("  Packet was discarded for an incorrect data type in protocol field")
