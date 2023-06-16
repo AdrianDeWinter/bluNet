@@ -161,7 +161,7 @@ function bluNet.send.number.boolean.string(recipient, message, protocol)
 	sendbyHostId(recipient, message, protocol)
 end
 
-function bluNet.send.number.boolean(recipient, message,)
+function bluNet.send.number.boolean(recipient, message)
 	sendbyHostId(recipient, message, protocol)
 end
 
