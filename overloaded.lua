@@ -1,6 +1,6 @@
 -- copied from: http://lua-users.org/wiki/OverloadedFunctions
 
-overloaded()
+function overloaded()
 	local fns = {}
 	local mt = {}
 
