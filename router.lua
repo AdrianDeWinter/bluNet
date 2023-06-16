@@ -88,20 +88,13 @@ function RouterClass:handleDnsRequest(sender, message)
 	--send a dns lookup into all connected networks
 	local result = {rednet.lookup(message.protocol, message.hostname)}
 	
-	--see if the requester has ended up in the list. if so, remove them
-	if verbosity >= 2 then
-		print("Local Hosts:")
-	end
-	
 	local routes = {}
-	for i,host in pairs (result) do
-		if host ~= sender.id then
-			local hostObj = HostClass(host, {self.id})
-			if verbosity >= 2 then
-				print("Host:\n"..tostring(hostObj).."\n")
-			end
-			table.insert(routes, hostObj)
+	for i,host in pairs(result) do
+		local hostObj = HostClass(host, {self.id})
+		if verbosity >= 2 then
+			print("Host:\n"..tostring(hostObj).."\n")
 		end
+		table.insert(routes, hostObj)
 	end
 	if verbosity >= 2 then
 		print("Found "..#routes .. " matching hosts locally, checking remote networks...")
@@ -111,24 +104,27 @@ function RouterClass:handleDnsRequest(sender, message)
 	local result = {rednet.lookup("router")}
 	local routers = {}
 	for _,routerId in pairs(result) do
-		router = HostClass(routerId)
+		local router = HostClass(routerId)
+		-- check if message has come via a particular router. if so, skip that one
 		if not table.contains(message.routers,router) then
 			if verbosity >= 2 then
-				print("Found Router:\n  "..tostring(router))
+				print("Found Router:\n  "..routerId)
 			end
+			-- add router to list of routers to query
 			table.insert(routers, RouterClass(routerId,{}))
 		elseif verbosity >= 2 then
-			print("Skipping Router:\n  "..tostring(router))
+			print("Skipping Router:\n  "..routerId)
 		end
 	end
 	
+	-- if other routers were found and not quet queried, pass the query along
 	if #routers > 0 then
 		if verbosity >= 1 then
 			print("Found "..(#routers).." other routers on the network, propagating request...")
 		end
 		
+		-- propagate the rrequest to each router
 		for _,router in pairs(routers) do
-			--send dns requests to all routers in range except self and the requester
 			if verbosity >= 2 then
 				print("Sending DNS Request to Router "..router.id)
 			end
@@ -140,7 +136,7 @@ function RouterClass:handleDnsRequest(sender, message)
 				print("Recieved " .. #result .. " host id's from the remote router "..router.id)
 			end
 			
-			--append the own id to each hosts route, and add them to the list of hosts
+			--append the own id to each routers route, and add them to the list of hosts
 			result = HostClass.fromTable(result)
 			for _,host in pairs(result) do
 				table.insert(host.route, self.id)
@@ -148,28 +144,8 @@ function RouterClass:handleDnsRequest(sender, message)
 			end
 		end
 	end
-	--find duplicate routes
-	local duplicates_exist = true
-	while duplicates_exist do
-		local duplicate_found = false
-		for i, route in pairs(routes) do
-			for j=i+1,#routes do
-				r2 = routes[j]
-				if route==r2 then
-					duplicate_found = true
-					if #route.route > #r2.route then
-						table.remove(routes, i)
-					else
-						table.remove(routes, j)
-					end
-				end
-				if duplicate_found then break end
-			end
-			if duplicate_found then break end
-		end
-		duplicates_exist = duplicate_found
-	end
 	
+	-- return the found routes to the requester
 	print ("Returning a total of "..#routes.." host id's to the requester")			
 	if verbosity >= 2 then
 		for i,route in pairs(routes) do
@@ -183,6 +159,8 @@ function RouterClass:handleTransmission(sender, message)
 	if verbosity >= 1 then 
 		print("Handling packet from "..sender.id)
 	end
+	
+	-- check for dangerous nil values and discard if necessary
 	if message == nil or message.route == nil or message.target == nil then
 		print("Discarding broken packet")
 		if verbosity >= 1 then
@@ -191,6 +169,7 @@ function RouterClass:handleTransmission(sender, message)
 		return
 	end
 	
+	-- check that a route table is present
 	if type(message.route) ~= "table" then
 		print("Discarding broken packet")
 		if verbosity >= 1 then
@@ -201,9 +180,13 @@ function RouterClass:handleTransmission(sender, message)
 		end
 		return
 	end
+	
+	-- check wether any hops are left
 	if #message.route == 0 then
 		print("A packet not addressed to this computer has reached TTL")
 		return
+	
+	-- hand off to target host
 	elseif #message.route == 1 then
 		if verbosity >= 2 then
 			print("Last router on route, passing packet to final destination")
