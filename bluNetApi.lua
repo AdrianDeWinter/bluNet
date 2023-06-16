@@ -9,23 +9,27 @@ local allowNonUniqueTargetHosts = allowNonUniqueTargetHosts or false
 local verbositiy = verbositiy or 0
 
 local function sendbyHostName(name, msg, protocol)
+	-- try to find the target on the local network
+	local target = {rednet.lookup(protocol, host)}
+	-- raise an error if the host does not exist
+	if next(target) == nil then
+		error("HostNotFoundError")
+	elseif #target ~= 1 then
+	-- raise and error if the host is not unique, unless configured otherwise
+		if allowNonUniqueTargetHosts then
+			rednet.send(target[1], msg, protocol)
+		else
+			error("HostNotUniqueError")
+		end
+	else
+		rednet.send(target[1], msg, protocol)
+	end
+
+	-- if routers are present, start a dns request
 	-- find routers
 	local routers = {rednet.lookup("router")}
-	-- if no routers are present, attempt to transmit in te local network
 	if next(routers) == nil then
-		local target = {rednet.lookup(protocol, host)}
-		-- raise an error if the host does not exist
-		if next(target) == nil then
-			error("HostNotFoundError")
-		elseif #target ~= 1 then
-		-- raise and error if the host is not unique, unless configured otherwise
-			if allowNonUniqueTargetHosts then
-				rednet.send(target[1], msg, protocol)
-			else
-				error("HostNotUniqueError")
-			end
-		end
-	-- if routers are present, start a dns request
+		error("HostNotfoundError")
 	else
 		rednet.send(routers[1], {protocol = protocol, hostname = name}, "dns_request")
 		local _, response,_ = rednet.receive("dns_response", 5)
