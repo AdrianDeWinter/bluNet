@@ -15,6 +15,7 @@ function overloaded()
 		local signature = {}
 		for i,arg in ipairs {...} do
 			signature[i] = type(arg)
+			if signature[i] == "nil" then signature[i] = "nil_val"
 		end
 		
 		signature = table.concat(signature, ",")

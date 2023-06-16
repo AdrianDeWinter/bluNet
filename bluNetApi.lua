@@ -48,7 +48,7 @@ local function sendbyHostName(name, msg, protocol)
 		end
 		
 		--send message along the shortest route
-		rednet.send(shortestRoute.route[#shortestRoute.route], {target = name, message = msg, protocol = protocol}
+		rednet.send(shortestRoute.route[#shortestRoute.route], {target = name, message = msg, protocol = protocol})
 	end
 end
 
@@ -73,7 +73,7 @@ function send.number.string.string(recipient, message, protocol)
 	sendbyHostid(recipient, message, protocol)
 end
 
-function send.number.string.nil(recipient, message, protocol)
+function send.number.string.nil_val(recipient, message, protocol)
 	sendbyHostid(recipient, message, protocol)
 end
 
@@ -81,7 +81,7 @@ function send.number.number.string(recipient, message, protocol)
 	sendbyHostid(recipient, message, protocol)
 end
 
-function send.number.number.nil(recipient, message, protocol)
+function send.number.number.nil_val(recipient, message, protocol)
 	sendbyHostid(recipient, message, protocol)
 end
 
@@ -89,7 +89,7 @@ function send.number.table.string(recipient, message, protocol)
 	sendbyHostid(recipient, message, protocol)
 end
 
-function send.number.table.nil(recipient, message, protocol)
+function send.number.table.nil_val(recipient, message, protocol)
 	sendbyHostid(recipient, message, protocol)
 end
 
@@ -97,7 +97,7 @@ function send.number.boolean.string(recipient, message, protocol)
 	sendbyHostid(recipient, message, protocol)
 end
 
-function send.number.boolean.nil(recipient, message, protocol)
+function send.number.boolean.nil_val(recipient, message, protocol)
 	sendbyHostid(recipient, message, protocol)
 end
 
@@ -109,7 +109,7 @@ function send.string.string.string(recipient, message, protocol)
 	sendbyHostName(recipient, message, protocol)
 end
 
-function send.string.string.nil(recipient, message, protocol)
+function send.string.string.nil_val(recipient, message, protocol)
 	sendbyHostName(recipient, message, protocol)
 end
 
@@ -117,7 +117,7 @@ function send.string.number.string(recipient, message, protocol)
 	sendbyHostName(recipient, message, protocol)
 end
 
-function send.string.number.nil(recipient, message, protocol)
+function send.string.number.nil_val(recipient, message, protocol)
 	sendbyHostName(recipient, message, protocol)
 end
 
@@ -125,7 +125,7 @@ function send.string.table.string(recipient, message, protocol)
 	sendbyHostName(recipient, message, protocol)
 end
 
-function send.string.table.nil(recipient, message, protocol)
+function send.string.table.nil_val(recipient, message, protocol)
 	sendbyHostName(recipient, message, protocol)
 end
 
@@ -133,6 +133,6 @@ function send.string.boolean.string(recipient, message, protocol)
 	sendbyHostName(recipient, message, protocol)
 end
 
-function send.string.boolean.nil(recipient, message, protocol)
+function send.string.boolean.nil_val(recipient, message, protocol)
 	sendbyHostName(recipient, message, protocol)
 end
