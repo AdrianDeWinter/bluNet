@@ -20,11 +20,13 @@ local function sendbyHostName(name, msg, protocol)
 	-- try to find the target on the local network
 	local target = {rednet.lookup(protocol, host)}
 	if verbosity >= 1 then
-		print("Recieved lookup Response with "..#target.."entries")
+		print("Recieved lookup Response with "..#target.." entries")
 	end
 	
 	if verbosity >= 2 then
-		print(target)
+		for _, v in pais(target) do
+			print v
+		end
 	end
 	
 	-- raise an error if the host does not exist
@@ -56,6 +58,7 @@ local function sendbyHostName(name, msg, protocol)
 		if verbosity >= 2 then
 			print("Sent")
 		end
+		return
 	end
 
 	-- if routers are present, start a dns request
@@ -74,7 +77,7 @@ local function sendbyHostName(name, msg, protocol)
 	else
 		if verbosity >= 2 then
 			print("Found "..#routers.." Router instances")
-			print("Querying router...")
+			print("Querying router "..router[1])
 		end
 		
 		rednet.send(routers[1], {protocol = protocol, hostname = name}, "dns_request")
@@ -94,9 +97,16 @@ local function sendbyHostName(name, msg, protocol)
 
 		-- restore to full HostClass ojects
 		local hosts = HostClass.fromTable(response)
-		
+			if verbosity >= 1 then
+				print("DNS yielded "..#hosts.." Results")
+			end
+		if verbosity >= 2 then
+			for _,v in hosts do
+				print(v)
+			end
+		end
 		--find shortest route
-		local shortestRoute = hosts[0].route
+		local shortestRoute = hosts[1].route
 		for host in pairs(hosts) do
 			if #host.route < #shortestRoute then
 				local shortestRoute = host
