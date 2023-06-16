@@ -132,35 +132,35 @@ end
 
 -- overloads for targeting host ids
 function bluNet.send.number.string.string(recipient, message, protocol)
-	sendbyHostid(recipient, message, protocol)
+	sendbyHostId(recipient, message, protocol)
 end
 
 function bluNet.send.number.string.nil_val(recipient, message, protocol)
-	sendbyHostid(recipient, message, protocol)
+	sendbyHostId(recipient, message, protocol)
 end
 
 function bluNet.send.number.number.string(recipient, message, protocol)
-	sendbyHostid(recipient, message, protocol)
+	sendbyHostId(recipient, message, protocol)
 end
 
 function bluNet.send.number.number.nil_val(recipient, message, protocol)
-	sendbyHostid(recipient, message, protocol)
+	sendbyHostId(recipient, message, protocol)
 end
 
 function bluNet.send.number.table.string(recipient, message, protocol)
-	sendbyHostid(recipient, message, protocol)
+	sendbyHostId(recipient, message, protocol)
 end
 
 function bluNet.send.number.table.nil_val(recipient, message, protocol)
-	sendbyHostid(recipient, message, protocol)
+	sendbyHostId(recipient, message, protocol)
 end
 
 function bluNet.send.number.boolean.string(recipient, message, protocol)
-	sendbyHostid(recipient, message, protocol)
+	sendbyHostId(recipient, message, protocol)
 end
 
 function bluNet.send.number.boolean.nil_val(recipient, message, protocol)
-	sendbyHostid(recipient, message, protocol)
+	sendbyHostId(recipient, message, protocol)
 end
 
 -- Overloads for targeting host names
