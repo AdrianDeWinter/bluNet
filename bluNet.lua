@@ -119,7 +119,7 @@ local function sendbyHostId(id, msg, protocol)
 end
 
 -- define overloads to discriminate between host name and host id based transmission
-send = overloaded()
+bluNet.send = overloaded()
 
 function bluNet.send.default(...)
 	local argTypes = ""
