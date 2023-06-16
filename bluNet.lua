@@ -9,6 +9,7 @@ local verbosity = verbosity or 2
 bluNet = {}
 
 local function sendbyHostName(name, msg, protocol)
+	local protocol = protocol or "bluNet_msg"
 	if verbosity >= 1 then
 		print("Attempting to message "..name.."...")
 	end
@@ -115,6 +116,7 @@ end
 
 
 local function sendbyHostId(id, msg, protocol)
+	local protocol = protocol or "bluNet_msg"
 	rednet.send(id, msg, protocol)
 end
 
@@ -135,7 +137,7 @@ function bluNet.send.number.string.string(recipient, message, protocol)
 	sendbyHostId(recipient, message, protocol)
 end
 
-function bluNet.send.number.string.nil_val(recipient, message, protocol)
+function bluNet.send.number.string(recipient, message)
 	sendbyHostId(recipient, message, protocol)
 end
 
@@ -143,7 +145,7 @@ function bluNet.send.number.number.string(recipient, message, protocol)
 	sendbyHostId(recipient, message, protocol)
 end
 
-function bluNet.send.number.number.nil_val(recipient, message, protocol)
+function bluNet.send.number.number(recipient, message)
 	sendbyHostId(recipient, message, protocol)
 end
 
@@ -151,7 +153,7 @@ function bluNet.send.number.table.string(recipient, message, protocol)
 	sendbyHostId(recipient, message, protocol)
 end
 
-function bluNet.send.number.table.nil_val(recipient, message, protocol)
+function bluNet.send.number.table(recipient, message)
 	sendbyHostId(recipient, message, protocol)
 end
 
@@ -159,7 +161,7 @@ function bluNet.send.number.boolean.string(recipient, message, protocol)
 	sendbyHostId(recipient, message, protocol)
 end
 
-function bluNet.send.number.boolean.nil_val(recipient, message, protocol)
+function bluNet.send.number.boolean(recipient, message,)
 	sendbyHostId(recipient, message, protocol)
 end
 
@@ -168,7 +170,7 @@ function bluNet.send.string.string.string(recipient, message, protocol)
 	sendbyHostName(recipient, message, protocol)
 end
 
-function bluNet.send.string.string.nil_val(recipient, message, protocol)
+function bluNet.send.string.string(recipient, message)
 	sendbyHostName(recipient, message, protocol)
 end
 
@@ -176,7 +178,7 @@ function bluNet.send.string.number.string(recipient, message, protocol)
 	sendbyHostName(recipient, message, protocol)
 end
 
-function bluNet.send.string.number.nil_val(recipient, message, protocol)
+function bluNet.send.string.number(recipient, message)
 	sendbyHostName(recipient, message, protocol)
 end
 
@@ -184,7 +186,7 @@ function bluNet.send.string.table.string(recipient, message, protocol)
 	sendbyHostName(recipient, message, protocol)
 end
 
-function bluNet.send.string.table.nil_val(recipient, message, protocol)
+function bluNet.send.string.table(recipient, message)
 	sendbyHostName(recipient, message, protocol)
 end
 
@@ -192,7 +194,7 @@ function bluNet.send.string.boolean.string(recipient, message, protocol)
 	sendbyHostName(recipient, message, protocol)
 end
 
-function bluNet.send.string.boolean.nil_val(recipient, message, protocol)
+function bluNet.send.string.boolean(recipient, message)
 	sendbyHostName(recipient, message, protocol)
 end
 
