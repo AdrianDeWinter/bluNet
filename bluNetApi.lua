@@ -28,7 +28,7 @@ local function sendbyHostName(name, msg, protocol)
 	-- if routers are present, start a dns request
 	else
 		rednet.send(routers[1], {protocol = protocol, hostname = name}, "dns_request")
-		_, local response,_ = rednet.receive("dns_response", 5)
+		local _, response,_ = rednet.receive("dns_response", 5)
 		if response == nil then
 			error("RequestTimeoutError")
 		end
