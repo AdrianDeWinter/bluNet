@@ -1,5 +1,6 @@
 local v = "0.1.0"
 print ("Using table utils version "..v)
+
 --injects functions into the table class, after calling this module via require(), any table in the program can use these methods
 function table:contains(element)
   for index, value in pairs(self) do
@@ -9,6 +10,7 @@ function table:contains(element)
   end
   return false
 end
+
 function table:removeItem(element)
 	for index, value in pairs(self) do
 		if value == element then
@@ -18,6 +20,7 @@ function table:removeItem(element)
 	end
 	return false
 end
+
 function table:toString(depth)
 	local depth = depth or 0
 	local retval = ""
@@ -61,6 +64,7 @@ function table:toString(depth)
 	end
 	return retval
 end
+
 function buildIndent(length, index)
 	local index = index or nil
 	length = length + 2

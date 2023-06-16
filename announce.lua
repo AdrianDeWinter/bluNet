@@ -11,3 +11,5 @@ hostname = "test_pc"..os.getComputerID()
 rednet.host(service, hostname)
 
 print("Hosting "..service.." as "..hostname)
+
+rednet.unhost(service)

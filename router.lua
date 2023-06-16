@@ -14,6 +14,7 @@ function RouterClass.__init__(baseClass, id, modems)
     return self
 end
 setmetatable(RouterClass, {__index=table,__call=RouterClass.__init__})
+
 function RouterClass:toString()
 	ret = "ID: "..self.id.."\nModems:\n"
 	for i,modem in pairs(self.modems) do
@@ -24,6 +25,7 @@ function RouterClass:toString()
 	end
 	return ret
 end
+
 function RouterClass.equal(host1, host2)
 	--test that both objects have a router property to distinguish routers from hosts
 	if not pcall(host1.modems ~= nil) and pcall(host2.modems ~= nil) then
@@ -33,6 +35,7 @@ function RouterClass.equal(host1, host2)
 	local result, retval = pcall(function() return host1.id == host2.id and host1.id ~= nil end)
 	return result and retval
 end
+
 --takes in a table of host objects and creates new host objects from them (used to restore mthods after transmission over the network)
 function RouterClass.fromTable(t)
 retval = {}
@@ -41,15 +44,16 @@ retval = {}
 	end
 	return retval
 end
+
 --listens for messages
 function RouterClass:listen()
 	ModemClass.openAllModems(self.modems)
 	rednet.host("router",("router"..self.id))
 	while true do
-		print("listening...")
+		print("Listening...")
 		local sender, message, protocol = rednet.receive()
 		sender = HostClass(sender)
-		print("recieved message")
+		print("Recieved message")
 		--recieved dns lookup request from a client
 		if protocol == "dns_request" then
 			self:handleDnsRequest(sender, message)
@@ -159,6 +163,7 @@ function RouterClass:handleDnsRequest(sender, message)
 	end
 	rednet.send(sender.id, routes, "dns_response")
 end
+
 function RouterClass:handleTransmission(sender, message)
 	if verbose >= 1 then 
 		print("Handling packet from "..sender.id)
