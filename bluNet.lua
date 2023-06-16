@@ -6,6 +6,8 @@ require ("overloaded")
 local allowNonUniqueTargetHosts = allowNonUniqueTargetHosts or false
 local verbosity = verbosity or 2
 
+bluNet = {}
+
 local function sendbyHostName(name, msg, protocol)
 	if verbosity >= 1 then
 		print("Attempting to message "..name.."...")

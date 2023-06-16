@@ -13,7 +13,7 @@ router = rednet.lookup("router")
 print("Found router "..router)
 
 print("Sending DNS request")
-rednet.send(router, {protocol = "test", hostname="pda"}, "dns_request")
+rednet.send(router, {protocol = "test_res", hostname="pda"}, "dns_request")
 print("Awaiting DNS response")
 
 s, response, p = rednet.receive("dns_response")
