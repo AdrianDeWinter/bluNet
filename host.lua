@@ -35,9 +35,11 @@ end
 --takes in a table of host objects and creates new host objects from them (used to restore class methods after transmission over the network)
 function HostClass.fromTable(t)
 	retval = {}
-	for _,host in ipairs(t) do
-		hostObj = HostClass(host.id, host.route)
-		table.insert(retval, hostObj)
+	if t ~= nil do
+		for _,host in ipairs(t) do
+			hostObj = HostClass(host.id, host.route)
+			table.insert(retval, hostObj)
+		end
 	end
 	return retval
 end
