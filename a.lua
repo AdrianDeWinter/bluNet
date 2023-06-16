@@ -1,7 +1,6 @@
 local v = "0.1.0"
 print ("Running test Script version "..v)
 require('host')
--- require('announce')
 
 
 router = rednet.lookup("router")

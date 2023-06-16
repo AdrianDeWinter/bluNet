@@ -21,12 +21,12 @@ local function sendbyHostName(name, msg, protocol)
 		-- raise and error if the host is not unique, unless configured otherwise
 			if allowNonUniqueTargetHosts then
 				rednet.send(target[1], msg, protocol)
-			else then
+			else
 				error("HostNotUniqueError")
 			end
 		end
 	-- if routers are present, start a dns request
-	else then
+	else
 		rednet.send(routers[1], {protocol = protocol, hostname = name}, "dns_request")
 		_, local response,_ = rednet.receive("dns_response", 5)
 		if response == nil then
@@ -49,6 +49,7 @@ local function sendbyHostName(name, msg, protocol)
 		
 		--send message along the shortest route
 		rednet.send(shortestRoute.route[#shortestRoute.route], {target = name, message = msg, protocol = protocol}
+	end
 end
 
 
