@@ -32,7 +32,8 @@ rednet.send(target.route[#target.route], {target = target.id, payload="test erfo
 bluNet.send("pda", "test erfolg", "test_res")
 
 rednet.host("test_channel", "test_pc")
-local _, msg, _ = bluNet.send(os.getComputerID(), "Full success!", "test_channel")
+bluNet.send(os.getComputerID(), "Full success!", "test_channel")
+local _, msg, _ = rednet.receive("test_channel")
 rednet.unhost("test_channel")
 print(msg)
 
