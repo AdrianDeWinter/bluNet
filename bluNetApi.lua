@@ -109,7 +109,7 @@ local function sendbyHostName(name, msg, protocol)
 		end
 		
 		--send message along the shortest route
-		rednet.send(shortestRoute.route[#shortestRoute.route], {target = name, message = msg, protocol = protocol}, "packet")
+		rednet.send(shortestRoute.route[#shortestRoute.route], {target = shortestRoute.id, payload = msg, protocol = protocol, route = shortestRoute.route}, "packet")
 	end
 end
 
