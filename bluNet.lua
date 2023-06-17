@@ -4,7 +4,7 @@ require("host")
 require ("overloaded")
 
 local allowNonUniqueTargetHosts = allowNonUniqueTargetHosts or false
-local verbosity = verbosity or 2
+local verbosity = verbosity or 0
 
 bluNet = {}
 

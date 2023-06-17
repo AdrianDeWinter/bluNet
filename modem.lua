@@ -1,7 +1,7 @@
 local v = "0.1.0"
 print ("Using Modem version "..v)
 
-local verbosity = verbosity or 2
+local verbosity = verbosity or 0
 
 ModemClass = {side="", parent={}}
 function ModemClass.__init__(baseClass, side, parent)

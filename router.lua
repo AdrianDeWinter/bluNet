@@ -1,10 +1,10 @@
-local v = "0.1.0"
+local v = "0.2.0"
 print ("Using Router version "..v)
 require('modem')
 require('host')
 require('tableUtils')
 
-local verbosity = verbosity or 2
+local verbosity = verbosity or 0
 
 --stores information about a router, specifically, which other routers and hosts are accessible through it
 RouterClass = {id=nil,modems={}}
@@ -108,12 +108,12 @@ function RouterClass:handleDnsRequest(sender, message)
 		-- check if message has come via a particular router. if so, skip that one
 		if not table.contains(message.routers,router) then
 			if verbosity >= 2 then
-				print("Found Router:\n  "..routerId)
+				print("Found Router: "..routerId)
 			end
 			-- add router to list of routers to query
 			table.insert(routers, RouterClass(routerId,{}))
 		elseif verbosity >= 2 then
-			print("Skipping Router:\n  "..routerId)
+			print("Skipping Router: "..routerId)
 		end
 	end
 	

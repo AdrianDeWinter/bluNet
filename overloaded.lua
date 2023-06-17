@@ -1,4 +1,6 @@
--- copied from: http://lua-users.org/wiki/OverloadedFunctions
+-- modified from: http://lua-users.org/wiki/OverloadedFunctions
+
+local verbosity = verbosity or 0
 
 function overloaded()
 	local fns = {}
@@ -26,13 +28,19 @@ function overloaded()
 	function mt:__index(key)
 		local signature = {}
 		local function __newindex(self, key, value)
-			print(key, type(key), value, type(value))
+			if verbosity >= 2 then
+				print(key, type(key), value, type(value))
+			end
 			signature[#signature+1] = key
 			fns[table.concat(signature, ",")] = value
-			print("bind", table.concat(signature, ", "))
+			if verbosity >= 2 then
+				print("bind", table.concat(signature, ", "))
+			end
 		end
 		local function __index(self, key)
-			print("I", key, type(key))
+			if verbosity >= 2 then
+				print("I", key, type(key))
+			end
 			signature[#signature+1] = key
 			return setmetatable({}, { __index = __index, __newindex = __newindex })
 		end

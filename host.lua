@@ -1,4 +1,4 @@
-local v = "0.1.0"
+local v = "0.2.0"
 print ("Using Host version "..v)
 
 --stores information about a client, specifically, its id and which modems it is connected to
