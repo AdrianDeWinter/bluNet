@@ -8,8 +8,10 @@ local verbosity = verbosity or 0
 
 bluNet = {}
 
+bluNet.DEFAULT_CHANNEL = "bluNet_msg"
+
 local function sendbyHostName(name, msg, protocol)
-	local protocol = protocol or "bluNet_msg"
+	local protocol = protocol or bluNet.DEFAULT_CHANNEL
 	if verbosity >= 1 then
 		print("Attempting to message "..name.."...")
 	end
@@ -116,14 +118,16 @@ end
 
 
 local function sendbyHostId(id, msg, protocol)
-	local protocol = protocol or "bluNet_msg"
+	local protocol = protocol or bluNet.DEFAULT_CHANNEL
 	rednet.send(id, msg, protocol)
 end
 
--- define overloads to discriminate between host name and host id based transmission
-bluNet.send = overloaded()
+local function broadcast(message, protocol)
+	local protocol = protocol or bluNet.DEFAULT_CHANNEL
+	rednet.broadcast({payload = message, protocol = protocol}, "broadcast")
+end
 
-function bluNet.send.default(...)
+local function invalidArgs(...)
 	local argTypes = ""
 	for _,v in ipairs(arg) do
 		argTypes = argTypes..type(v)..", "
@@ -131,6 +135,13 @@ function bluNet.send.default(...)
 	argtypes = argTypes:sub(1, -3) -- delete trailing ", "
 	print ("Invalid argument types: "..argTypes)
 end
+
+-- define overloads to discriminate between host name and host id based transmission
+bluNet.send = overloaded()
+bluNet.broadCast = overloaded()
+
+bluNet.send.default = invalidArgs
+bluNet.broadCast.default = invalidArgs
 
 -- overloads for targeting host ids
 function bluNet.send.number.string.string(recipient, message, protocol)
@@ -199,18 +210,34 @@ function bluNet.send.string.boolean(recipient, message)
 end
 
 -- Overloads for targeting protocols
-function bluNet.send.nil_val.string.string(recipient, message, protocol)
-	sendbyHostName(recipient, message, protocol)
+function bluNet.broadCast.string.string(message, protocol)
+	broadcast(message, protocol)
 end
 
-function bluNet.send.nil_val.number.string(recipient, message, protocol)
-	sendbyHostName(recipient, message, protocol)
+function bluNet.broadCast.string(message)
+	broadcast(message, protocol)
 end
 
-function bluNet.send.nil_val.table.string(recipient, message, protocol)
-	sendbyHostName(recipient, message, protocol)
+function bluNet.broadCast.number.string(message, protocol)
+	broadcast(message, protocol)
 end
 
-function bluNet.send.nil_val.boolean.string(recipient, message, protocol)
-	sendbyHostName(recipient, message, protocol)
+function bluNet.broadCast.number(message)
+	broadcast(message, protocol)
+end
+
+function bluNet.broadCast.table.string(message, protocol)
+	broadcast(message, protocol)
+end
+
+function bluNet.broadCast.table(message)
+	broadcast(message, protocol)
+end
+
+function bluNet.broadCast.boolean.string(message, protocol)
+	broadcast(message, protocol)
+end
+
+function bluNet.broadCast.boolean(message)
+	broadcast(message, protocol)
 end

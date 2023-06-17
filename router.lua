@@ -8,6 +8,7 @@ local verbosity = verbosity or 0
 
 --stores information about a router, specifically, which other routers and hosts are accessible through it
 RouterClass = {id=nil,modems={}}
+
 function RouterClass.__init__(baseClass, id, modems)
 	id = id or -1
 	modems = modems or {}
@@ -64,6 +65,8 @@ function RouterClass:listen()
 			self:handleDnsRequest(sender, message)
 		elseif protocol == "packet" then
 			self:handleTransmission(sender, message)
+		elseif protocol == "broadcast" then
+			self:handleBroadcast(sender, message)
 		else
 			print("From "..sender.id.." via "..(protocol or "any")..":")
 			if protocol == "dns" then
@@ -227,4 +230,44 @@ function RouterClass:handleTransmission(sender, message)
 		end
 		rednet.send(nextHop, message, "packet")
 	end
+end
+
+function RouterClass:handleBroadcast(sender, message)
+	local message = message
+	
+	if verbosity >= 1 then
+		print("Handling broadcast from "..sender.id)
+	end
+	
+	--catch broken packets
+	if message ~= nil and type(message.protocol) ~= "string" then
+		print("Discarding broken packet")
+		if verbosity >= 1 then
+			print("  Packet was discarded for an incorrect data type in protocol field")
+		end
+		if verbosity >= 2 then
+			print("  Got "..type(message.protocol).." instead of 'string'")
+		end
+		return
+	end
+	
+	-- create routers list on the message if it does not yet exist
+	message.routers = message.routers or {}
+	-- break processing if this message was already handled on this router
+	if table.contains(message.routers, self.id) then
+		if verbosity >= 1 then
+			print("Duplicate of previous broadcast message. Won't rebroadcast")
+		end
+		return
+	end
+	
+	if verbosity >= 1 then
+		print("Rebroadcasting packet on "..message.protocol)
+	end
+	table.insert(message.routers, self.id)
+	-- pass to routers
+	rednet.broadcast(message, "broadcast")
+
+	--send on to recipients
+	rednet.broadcast(message.payload, message.protocol)	
 end
