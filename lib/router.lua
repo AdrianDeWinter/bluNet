@@ -1,10 +1,15 @@
 local v = "0.2.0"
 print ("Using Router version "..v)
-require('modem')
-require('host')
-require('tableUtils')
 
 local verbosity = verbosity or 0
+
+-- get project root from global contxt or use this files location
+PROJECT_ROOT = PROJECT_ROOT or ""
+
+require(PROJECT_ROOT..'/lib/modem')
+require(PROJECT_ROOT..'/lib/host')
+require(PROJECT_ROOT..'/lib/tableUtils')
+
 
 --stores information about a router, specifically, which other routers and hosts are accessible through it
 RouterClass = {id=nil,modems={}}
