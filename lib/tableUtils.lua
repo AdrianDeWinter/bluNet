@@ -1,9 +1,8 @@
 local v = "0.1.0"
 print ("Using table utils version "..v)
 
---injects functions into the table class, after calling this module via require(), any table in the program can use these methods
-function table:contains(element, t)
-	local t = self or t
+--add functions to the table class
+function table.contains(t, element)
 	for index, value in pairs(t) do
 		if value == element then
 			return index
@@ -12,8 +11,7 @@ function table:contains(element, t)
 	return false
 end
 
-function table:removeItem(element, t)
-	local t = self or t
+function table.removeItem(t, element)
 	for index, value in pairs(t) do
 		if value == element then
 			t:remove(index)
@@ -23,8 +21,7 @@ function table:removeItem(element, t)
 	return false
 end
 
-function table:toString(depth, t)
-	local t = self or t
+function table.toString(t, depth)
 	local depth = depth or 0
 	local retval = ""
 	local longestKey = 0
@@ -69,8 +66,7 @@ function table:toString(depth, t)
 end
 
 -- copies all key, value pairs into a new table
-function table:copy(t)
-	local t = self or t
+function table.copy(t)
 	local u = {}
 	for key, value in pairs(t) do
 		u.key = value
