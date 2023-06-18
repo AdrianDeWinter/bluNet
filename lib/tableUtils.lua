@@ -2,38 +2,41 @@ local v = "0.1.0"
 print ("Using table utils version "..v)
 
 --injects functions into the table class, after calling this module via require(), any table in the program can use these methods
-function table:contains(element)
-  for index, value in pairs(self) do
-    if value == element then
-      return index
-    end
-  end
-  return false
+function table:contains(element, t)
+	local t = self or t
+	for index, value in pairs(t) do
+		if value == element then
+			return index
+		end
+	end
+	return false
 end
 
-function table:removeItem(element)
-	for index, value in pairs(self) do
+function table:removeItem(element, t)
+	local t = self or t
+	for index, value in pairs(t) do
 		if value == element then
-			self:remove(index)
+			t:remove(index)
 			return true
 		end
 	end
 	return false
 end
 
-function table:toString(depth)
+function table:toString(depth, t)
+	local t = self or t
 	local depth = depth or 0
 	local retval = ""
 	local longestKey = 0
 	--find longest key in table level
-	for key,_ in pairs(self) do
+	for key,_ in pairs(t) do
 		local length = string.len(tostring(key))
 		if length > longestKey then
 			longestKey = length
 		end
 	end
 	
-	for index,v in pairs(self) do
+	for index,v in pairs(t) do
 	retval = retval.."\n "
 	--print(retval)
 		if type(v) == "table" then
@@ -64,6 +67,18 @@ function table:toString(depth)
 	end
 	return retval
 end
+
+-- copies all key, value pairs into a new table
+function table:copy(t)
+	local t = self or t
+	local u = {}
+	for key, value in pairs(t) do
+		u.key = value
+	end
+	return u
+end
+
+
 
 function buildIndent(length, index)
 	local index = index or nil
