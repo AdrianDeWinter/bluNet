@@ -1,7 +1,7 @@
 local v = "0.1.0"
 print ("Running bluNet api version "..v)
 
--- get project root from global contxt or use this files location
+-- get project root from global context or use this files location
 PROJECT_ROOT = PROJECT_ROOT or "/"..fs.getDir(debug.getinfo(1).source:sub(2))
 require(PROJECT_ROOT.."/lib/host")
 require(PROJECT_ROOT.."/lib/overloaded")

@@ -3,7 +3,7 @@ print ("Using Router version "..v)
 
 local verbosity = verbosity or 0
 
--- get project root from global contxt or use this files location
+-- get project root from global context or use this files location
 PROJECT_ROOT = PROJECT_ROOT or ""
 
 require(PROJECT_ROOT..'/lib/modem')
