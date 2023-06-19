@@ -55,11 +55,6 @@ end
 
 --listens for messages
 function RouterClass:listen()
-	ModemClass.openAllModems(self.modems)
-	rednet.host("router",("router"..self.id))
-	if verbosity >= 2 then
-		print("Running router on computer "..self.id)
-	end
 	while true do
 		print("Listening...")
 		local sender, message, protocol = rednet.receive()

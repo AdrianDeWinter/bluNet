@@ -6,6 +6,7 @@ PROJECT_ROOT = PROJECT_ROOT or "/"..fs.getDir(fs.getDir(debug.getinfo(1).source:
 
 require(PROJECT_ROOT.."/lib/host")
 require(PROJECT_ROOT.."/lib/overloaded")
+require(PROJECT_ROOT.."/lib/router")
 
 local allowNonUniqueTargetHosts = allowNonUniqueTargetHosts or false
 local verbosity = verbosity or 0
@@ -138,6 +139,19 @@ local function invalidArgs(...)
 	end
 	argtypes = argTypes:sub(1, -3) -- delete trailing ", "
 	print ("Invalid argument types: "..argTypes)
+end
+
+function bluNet.startRouter()
+	ModemClass.openAllModems()
+	local selfRouter = RouterClass(os.getComputerID())
+	selfRouter.modems = ModemClass.getAllModems(selfRouter)
+
+	rednet.host("router",("router"..selfRouter.id))
+	if verbosity >= 2 then
+		print("Running router on computer "..selfRouter.id)
+	end
+	
+	selfRouter:listen()
 end
 
 -- define overloads to discriminate between host name and host id based transmission
