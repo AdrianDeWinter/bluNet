@@ -16,15 +16,73 @@ bluNet = {}
 bluNet.DEFAULT_CHANNEL = "bluNet_msg"
 
 local function sendbyHostName(name, msg, protocol)
-	local protocol = protocol or bluNet.DEFAULT_CHANNEL
 	if verbosity >= 1 then
 		print("Attempting to message "..name.."...")
 	end
-	
 	if verbosity >= 2 then
 		print("Message: "..msg)
 	end
 	
+	-- determine protocol
+	local protocol = protocol or bluNet.DEFAULT_CHANNEL
+	
+	local success, target = pcall(bluNet.findRoute, protocol, name)
+	if success then
+		--send message along the shortest route
+		rednet.send(target.route[#target.route], {target = target.id, payload = msg, protocol = protocol, route = target.route}, "packet")
+	else
+		if verbosity >= 1 then
+			print("DNS failed. Trying local network...")
+		end
+	
+		--try to send locally
+		success, target = pcall(bluNet.findLocally, protocol, name)
+		if success then
+			rednet.send(target, msg, protocol)
+		end
+	end
+	
+	if verbosity >= 2 then
+		if success then
+			print("Sent")
+		else
+			print("Target not found")
+		end
+end
+
+local function sendbyHostId(id, msg, protocol)
+	local protocol = protocol or bluNet.DEFAULT_CHANNEL
+	rednet.send(id, msg, protocol)
+end
+
+local function broadcast(message, protocol)
+	local protocol = protocol or bluNet.DEFAULT_CHANNEL
+	rednet.broadcast({payload = message, protocol = protocol}, "broadcast")
+end
+
+local function invalidArgs(...)
+	local argTypes = ""
+	for _,v in ipairs(arg) do
+		argTypes = argTypes..type(v)..", "
+	end
+	argtypes = argTypes:sub(1, -3) -- delete trailing ", "
+	print ("Invalid argument types: "..argTypes)
+end
+
+function bluNet.startRouter()
+	ModemClass.openAllModems()
+	local selfRouter = RouterClass(os.getComputerID())
+	selfRouter.modems = ModemClass.getAllModems(selfRouter)
+
+	rednet.host("router",("router"..selfRouter.id))
+	if verbosity >= 2 then
+		print("Running router on computer "..selfRouter.id)
+	end
+	
+	selfRouter:listen()
+end
+
+function bluNet.findLocally(protocol, host)
 	-- try to find the target on the local network
 	local target = {rednet.lookup(protocol, host)}
 	if verbosity >= 1 then
@@ -45,7 +103,7 @@ local function sendbyHostName(name, msg, protocol)
 				if verbosity >= 1 then
 					print("Target host was not unique. allowNonUniqueTargetHosts is set to true. Sending message...")
 				end
-				rednet.send(target[1], msg, protocol)
+				return target[1]
 			else
 				if verbosity >= 1 then
 					print("Target host was not unique. Set allowNonUniqueTargetHosts to true to send anyways")
@@ -55,19 +113,17 @@ local function sendbyHostName(name, msg, protocol)
 		-- if a unique target host was found, send the message
 		else
 			if verbosity >= 1 then
-				print("Sending on local network")
+				print("Found target on local network")
 			end
-			rednet.send(target[1], msg, protocol)
-			if verbosity >= 2 then
-				print("Sent")
-			end
-			return
+			return target[1]
 		end
 	end
+end
 
+function bluNet.findRoute(protocol, host)
 	-- if routers are present and we have not returned yet, start a dns request
 	if verbosity >= 1 then
-		print("Target not on local network. Querying DNS...")
+		print("Querying DNS...")
 	end
 	
 	local routers = {rednet.lookup("router")}
@@ -115,43 +171,8 @@ local function sendbyHostName(name, msg, protocol)
 				shortestRoute = host
 			end
 		end
-		
-		--send message along the shortest route
-		rednet.send(shortestRoute.route[#shortestRoute.route], {target = shortestRoute.id, payload = msg, protocol = protocol, route = shortestRoute.route}, "packet")
+		return shortestRoute
 	end
-end
-
-
-local function sendbyHostId(id, msg, protocol)
-	local protocol = protocol or bluNet.DEFAULT_CHANNEL
-	rednet.send(id, msg, protocol)
-end
-
-local function broadcast(message, protocol)
-	local protocol = protocol or bluNet.DEFAULT_CHANNEL
-	rednet.broadcast({payload = message, protocol = protocol}, "broadcast")
-end
-
-local function invalidArgs(...)
-	local argTypes = ""
-	for _,v in ipairs(arg) do
-		argTypes = argTypes..type(v)..", "
-	end
-	argtypes = argTypes:sub(1, -3) -- delete trailing ", "
-	print ("Invalid argument types: "..argTypes)
-end
-
-function bluNet.startRouter()
-	ModemClass.openAllModems()
-	local selfRouter = RouterClass(os.getComputerID())
-	selfRouter.modems = ModemClass.getAllModems(selfRouter)
-
-	rednet.host("router",("router"..selfRouter.id))
-	if verbosity >= 2 then
-		print("Running router on computer "..selfRouter.id)
-	end
-	
-	selfRouter:listen()
 end
 
 -- define overloads to discriminate between host name and host id based transmission
