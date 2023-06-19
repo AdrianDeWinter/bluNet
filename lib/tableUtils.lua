@@ -75,6 +75,15 @@ function table.copy(t)
 end
 
 
+-- "upgrades a table. Sets table.toString as it's tostring mrthod, and adds all other methods from this module to the table"
+function table.upgrade(t)
+	local mt = getmetatable(t) or {}
+	mt.__tostring = table.toString
+	setmetatable(t, mt)
+	t.contains = table.contains
+	t.removeItem = table.removeItem
+	t.copy = table.copy
+end
 
 function buildIndent(length, index)
 	local index = index or nil
