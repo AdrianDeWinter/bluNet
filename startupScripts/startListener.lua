@@ -9,8 +9,8 @@ PROJECT_ROOT = PROJECT_ROOT or "/"..fs.getDir(fs.getDir(debug.getinfo(1).source:
 require(PROJECT_ROOT.."/lib/modem")
 
 ModemClass.openAllModems()
-
+rednet.host("test_res", "test_host")
 while true do
 	local src, msg, prtcl = rednet.receive()
-	print("From: "..src..", via "..prtcl.."\n  "..msg)
+	print("From: "..src..", via "..prtcl.."\n  "..tostring(msg))
 end
