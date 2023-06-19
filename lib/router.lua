@@ -1,10 +1,15 @@
 local v = "0.2.0"
 print ("Using Router version "..v)
-require('modem')
-require('host')
-require('tableUtils')
 
 local verbosity = verbosity or 0
+
+-- get project root from global context or use this files location
+PROJECT_ROOT = PROJECT_ROOT or "/"..fs.getDir(fs.getDir(debug.getinfo(1).source:sub(2)))
+
+require(PROJECT_ROOT..'/lib/modem')
+require(PROJECT_ROOT..'/lib/host')
+require(PROJECT_ROOT..'/lib/tableUtils')
+
 
 --stores information about a router, specifically, which other routers and hosts are accessible through it
 RouterClass = {id=nil,modems={}}
@@ -50,11 +55,6 @@ end
 
 --listens for messages
 function RouterClass:listen()
-	ModemClass.openAllModems(self.modems)
-	rednet.host("router",("router"..self.id))
-	if verbosity >= 2 then
-		print("Running router on computer "..self.id)
-	end
 	while true do
 		print("Listening...")
 		local sender, message, protocol = rednet.receive()
