@@ -2,7 +2,7 @@ local v = "0.1.0"
 print ("Running bluNet api version "..v)
 
 -- get project root from global context or use this files location
-PROJECT_ROOT = PROJECT_ROOT or "/"..fs.getDir(fs.getDir(debug.getinfo(1).source:sub(2)))
+PROJECT_ROOT = PROJECT_ROOT or "/"..fs.getDir(debug.getinfo(1).source:sub(2))
 
 require(PROJECT_ROOT.."/lib/host")
 require(PROJECT_ROOT.."/lib/overloaded")
@@ -14,6 +14,7 @@ local verbosity = verbosity or 0
 bluNet = {}
 
 bluNet.DEFAULT_CHANNEL = "bluNet_msg"
+bluNet.FILE_TRANSFER_CHANNEL = "bluNet_ft"
 
 local function sendbyHostName(name, msg, protocol)
 	if verbosity >= 1 then
@@ -48,6 +49,7 @@ local function sendbyHostName(name, msg, protocol)
 		else
 			print("Target not found")
 		end
+	end
 end
 
 local function sendbyHostId(id, msg, protocol)
@@ -172,6 +174,35 @@ function bluNet.findRoute(protocol, host)
 			end
 		end
 		return shortestRoute
+	end
+end
+
+function bluNet.sendFile(path, targetName)
+	if verbosity > 1 then
+		print("Sending file "..path.." to "..targetName)
+	end
+	if verbosity > 2 then
+		print("Opening file...")
+	end
+	local file = fs.open(path, "r")
+
+	if verbosity > 2 then
+		print("Reading...")
+	end
+	local content = file.readAll()
+	file.close()
+	
+	if verbosity > 1 then
+		print("File read")
+	end
+	if verbosity > 2 then
+		print("Read "..#content.."lines")
+	end
+	
+	sendbyHostName(targetName, content, bluNet.FILE_TRANSFER_CHANNEL)
+	
+	if verbosity > 2 then
+		print("Sent")
 	end
 end
 
