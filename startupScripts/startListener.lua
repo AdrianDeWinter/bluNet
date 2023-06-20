@@ -7,10 +7,15 @@ verbosity=1
 PROJECT_ROOT = PROJECT_ROOT or "/"..fs.getDir(fs.getDir(debug.getinfo(1).source:sub(2)))
 
 require(PROJECT_ROOT.."/lib/modem")
+require(PROJECT_ROOT.."/lib/tableUtils")
 
 ModemClass.openAllModems()
 rednet.host("test_res", "test_host")
+rednet.host("bluNet_msg", "test_host")
+rednet.host("bluNet_ft", "test_host")
 while true do
 	local src, msg, prtcl = rednet.receive()
-	print("From: "..src..", via "..prtcl.."\n  "..tostring(msg))
+	local msg_str = ""
+	if type(msg)=="table" then msg_str = table.toString(msg) else msg_str = tostring(msg) end
+	print("From: "..src..", via "..prtcl.."\n  "..msg_str)
 end
