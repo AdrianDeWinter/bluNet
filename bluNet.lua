@@ -186,7 +186,7 @@ function bluNet.receive(channel, hostName)
 	
 	rednet.unhost(channel)
 	
-	return msg
+	return msg, src
 end
 
 function bluNet.sendFile(path, targetName)
@@ -220,16 +220,26 @@ end
 
 function bluNet.receiveFile(targetPath, name)
 	local targetPath = targetPath or "/download"
-	if not fs.isDir(targetpath) then
-		error("Path is not a directory")
+	if fs.exists(targetPath) and not fs.isDir(targetPath) then
+		error("Path "..targetPath.." is not a directory")
 	end
 	local name = name or ""
 	
 	if verbosity >= 1 then
-		print("Receiving file "..name.."into"..targetPath)
+		if not (name == "") then
+			print("Expecting to receive file "..name.." into "..targetPath)
+		else
+			print("Expecting to receive a file into "..targetPath)
+		end
 	end
 	
 	local msg = bluNet.receive(bluNet.FILE_TRANSFER_CHANNEL, "PC"..os.getComputerID())
+	
+	
+	if verbosity >= 1 then
+		print("Recived file from "..name.." into "..targetPath)
+	end
+	
 	
 	if msg.name == nil or msg.name == "" then
 		error("Missing filename in file transfer operation")
@@ -240,15 +250,18 @@ function bluNet.receiveFile(targetPath, name)
 		end
 	end
 	
-	targetPath = targetPath..name
-	if fs.exists(targetPath) then
+	local intendedFullPath = targetPath.."/"..name
+	local actualFullpath = intendedFullPath
+	local retries = 0
+	while fs.exists(actualFullpath) do
+		retries = retries + 1
 		if verbosity >= 2 then
-			print("File "..targetPath.." exists, renaming")
+			print("File "..actualFullpath.." exists, renaming")
 		end
-		targetPath = targetPath.."2"
+		actualFullpath = intendedFullPath..retries
 	end
 	
-	file = fs.open(targetPath, "w")
+	file = fs.open(actualFullpath, "w")
 	file.write(msg.file)
 	file.close()
 	if verbosity >= 1 then
