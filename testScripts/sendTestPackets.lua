@@ -2,7 +2,7 @@ local v = "0.2.0"
 verbosity = 2
 allowNonuniqueTargetHosts = true
 -- get project root from global context or use this files location
-PROJECT_ROOT = PROJECT_ROOT or "/"..fs.getDir(debug.getinfo(1).source:sub(2))
+PROJECT_ROOT = PROJECT_ROOT or "/"..fs.getDir(fs.getDir(debug.getinfo(1).source:sub(2)))
 
 print ("Running test Script version "..v)
 require(PROJECT_ROOT..'/lib/host')
@@ -15,7 +15,7 @@ router = rednet.lookup("router")
 print("Found router "..router)
 
 print("Sending DNS request")
-rednet.send(router, {protocol = "test_res", hostname="pda"}, "dns_request")
+rednet.send(router, {protocol = "test_res", hostname="test_host"}, "dns_request")
 print("Awaiting DNS response")
 
 s, response, p = rednet.receive("dns_response")
@@ -29,9 +29,9 @@ end
 
 print("sending test packet")
 local target = response[1]
-rednet.send(target.route[#target.route], {target = target.id, payload="test erfolg", protocol="test_res", route=target.route}, "packet")
+rednet.send(target.route[#target.route], {target = target.id, payload="DNS test successful", protocol="test_res", route=target.route}, "packet")
 
-bluNet.send("pda", "test erfolg", "test_res")
+bluNet.send("test_host", "bluNet test successful", "test_res")
 
 rednet.host("test_channel", "test_pc")
 bluNet.send(os.getComputerID(), "Full success!", "test_channel")
