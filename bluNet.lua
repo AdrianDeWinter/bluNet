@@ -1,4 +1,4 @@
-local v = "0.1.0"
+local v = "0.2.0"
 print ("Running bluNet api version "..v)
 
 -- get project root from global context or use this files location
@@ -21,7 +21,7 @@ local function sendbyHostName(name, msg, protocol)
 		print("Attempting to message "..name.."...")
 	end
 	if verbosity >= 2 then
-		print("Message: "..msg)
+		print("Message: "..tostring(msg))
 	end
 	
 	-- determine protocol
@@ -177,6 +177,18 @@ function bluNet.findRoute(protocol, host)
 	end
 end
 
+function bluNet.receive(channel, hostName)
+	local channel = channel or bluNet.DEFAULT_CHANNEL
+	
+	rednet.host(channel, hostName)
+	
+	src, msg, prtcl = rednet.receive(channel)
+	
+	rednet.unhost(channel)
+	
+	return msg
+end
+
 function bluNet.sendFile(path, targetName)
 	if verbosity > 1 then
 		print("Sending file "..path.." to "..targetName)
@@ -199,10 +211,48 @@ function bluNet.sendFile(path, targetName)
 		print("Read "..#content.."lines")
 	end
 	
-	sendbyHostName(targetName, content, bluNet.FILE_TRANSFER_CHANNEL)
+	sendbyHostName(targetName, {name = fs.getName(path), file = content}, bluNet.FILE_TRANSFER_CHANNEL)
 	
 	if verbosity > 2 then
 		print("Sent")
+	end
+end
+
+function bluNet.receiveFile(targetPath, name)
+	local targetPath = targetPath or "/download"
+	if not fs.isDir(targetpath) then
+		error("Path is not a directory")
+	end
+	local name = name or ""
+	
+	if verbosity >= 1 then
+		print("Receiving file "..name.."into"..targetPath)
+	end
+	
+	local msg = bluNet.receive(bluNet.FILE_TRANSFER_CHANNEL, "PC"..os.getComputerID())
+	
+	if msg.name == nil or msg.name == "" then
+		error("Missing filename in file transfer operation")
+	elseif name == "" then
+		name = msg.name
+		if verbosity >= 2 then
+			print("Using original file name since none was supplied")
+		end
+	end
+	
+	targetPath = targetPath..name
+	if fs.exists(targetPath) then
+		if verbosity >= 2 then
+			print("File "..targetPath.." exists, renaming")
+		end
+		targetPath = targetPath.."2"
+	end
+	
+	file = fs.open(targetPath, "w")
+	file.write(msg.file)
+	file.close()
+	if verbosity >= 1 then
+		print("  Done")
 	end
 end
 
