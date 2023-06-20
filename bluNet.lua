@@ -50,6 +50,7 @@ local function sendbyHostName(name, msg, protocol)
 			print("Target not found")
 		end
 	end
+	return success
 end
 
 local function sendbyHostId(id, msg, protocol)
@@ -119,6 +120,11 @@ function bluNet.findLocally(protocol, host)
 			end
 			return target[1]
 		end
+	else
+		if verbosity >= 1 then
+			print("DNS yielded no results. Host can not be reached")
+		end
+		error("HostNotfoundError")
 	end
 end
 
@@ -177,6 +183,9 @@ function bluNet.findRoute(protocol, host)
 	end
 end
 
+-- Listens on the provided channel for messages adressed at hostName
+-- If no channel is prided, bluNet.DEFAULT_CHANNEL is used.
+-- If no host name is provided, listens for all messages sent on that channel
 function bluNet.receive(channel, hostName)
 	local channel = channel or bluNet.DEFAULT_CHANNEL
 	
@@ -189,6 +198,7 @@ function bluNet.receive(channel, hostName)
 	return msg, src
 end
 
+--Transmits the file at path to the host named targetName
 function bluNet.sendFile(path, targetName)
 	if verbosity > 1 then
 		print("Sending file "..path.." to "..targetName)
@@ -196,11 +206,13 @@ function bluNet.sendFile(path, targetName)
 	if verbosity > 2 then
 		print("Opening file...")
 	end
+	
 	local file = fs.open(path, "r")
 
 	if verbosity > 2 then
 		print("Reading...")
 	end
+	
 	local content = file.readAll()
 	file.close()
 	
@@ -218,29 +230,34 @@ function bluNet.sendFile(path, targetName)
 	end
 end
 
-function bluNet.receiveFile(targetPath, name)
-	local targetPath = targetPath or "/download"
-	if fs.exists(targetPath) and not fs.isDir(targetPath) then
-		error("Path "..targetPath.." is not a directory")
+-- Waits for a file transmission
+-- The transmitted file is stored into the targetDir directory, or /download if nil is passed
+-- The file is stored with the given name, or it's original name if nil is passed
+function bluNet.receiveFile(targetDir, name)
+	local targetDir = targetDir or "/download"
+	-- targetDir must be a directory
+	if fs.exists(targetDir) and not fs.isDir(targetDir) then
+		error("Path "..targetDir.." is not a directory")
 	end
 	local name = name or ""
 	
 	if verbosity >= 1 then
 		if not (name == "") then
-			print("Expecting to receive file "..name.." into "..targetPath)
+			print("Expecting to receive file "..name.." into "..targetDir)
 		else
-			print("Expecting to receive a file into "..targetPath)
+			print("Expecting to receive a file into "..targetDir)
 		end
 	end
 	
+	-- wait for the file transmission
 	local msg = bluNet.receive(bluNet.FILE_TRANSFER_CHANNEL, "PC"..os.getComputerID())
 	
 	
 	if verbosity >= 1 then
-		print("Recived file from "..name.." into "..targetPath)
+		print("Recived file from "..name.." into "..targetDir)
 	end
 	
-	
+	-- check message integrity
 	if msg.name == nil or msg.name == "" then
 		error("Missing filename in file transfer operation")
 	elseif name == "" then
@@ -250,18 +267,19 @@ function bluNet.receiveFile(targetPath, name)
 		end
 	end
 	
-	local intendedFullPath = targetPath.."/"..name
-	local actualFullpath = intendedFullPath
+	-- test file collision and build alternative path
+	local intendedFullPath = targetDir.."/"..name
+	local actualFullPath = intendedFullPath
 	local retries = 0
-	while fs.exists(actualFullpath) do
+	while fs.exists(actualFullPath) do
 		retries = retries + 1
 		if verbosity >= 2 then
-			print("File "..actualFullpath.." exists, renaming")
+			print("File "..actualFullPath.." exists, renaming")
 		end
-		actualFullpath = intendedFullPath..retries
+		actualFullPath = intendedFullPath..retries
 	end
 	
-	file = fs.open(actualFullpath, "w")
+	local file = fs.open(actualFullPath, "w")
 	file.write(msg.file)
 	file.close()
 	if verbosity >= 1 then
