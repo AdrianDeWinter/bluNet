@@ -2,7 +2,7 @@ local v = "0.2.0"
 verbosity = 2
 allowNonuniqueTargetHosts = true
 -- get project root from global context or use this files location
-PROJECT_ROOT = PROJECT_ROOT or "/"..fs.getDir(debug.getinfo(1).source:sub(2))
+PROJECT_ROOT = PROJECT_ROOT or "/"..fs.getDir(fs.getDir(debug.getinfo(1).source:sub(2)))
 
 print ("Running test Script version "..v)
 require(PROJECT_ROOT..'/lib/host')
